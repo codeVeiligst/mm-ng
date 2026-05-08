@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "sourceMap": true,
+    "skipLibCheck": true,
+    "noEmitOnError": false
+  },
+  "exclude": [
+    "bower_components",
+    "node_modules",
+    "typings"
+  ]
+}

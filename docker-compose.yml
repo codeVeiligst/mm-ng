@@ -1,0 +1,183 @@
+name: mm-ng
+
+services:
+  redis:
+    image: redis:7-alpine@sha256:286bd4264adb303147270bb2d735352497e950f7b73b2ca42364d63d7daf61ee
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 2s
+      timeout: 1s
+      retries: 30
+
+  core:
+    image: mm-ng-core
+    container_name: mm-ng-core
+    build:
+      context: ./mm-ng-core
+    ulimits:
+      nofile:
+        soft: 65535
+        hard: 65535
+    depends_on:
+      redis:
+        condition: service_healthy
+    environment:
+      REDIS_URL: redis://redis:6379/0
+      MM_NG_SKIP_NATIVE: "1"
+      MM_DISABLE_COLLECTD: "1"
+      MM_RUNTIME_CONFIG_DIR: /var/lib/mm-ng-core/config
+      MM_RUNTIME_CONTROL_DIR: /var/lib/mm-ng-core/control
+      MM_RUNTIME_DATA_DIR: /var/lib/mm-ng-core/data
+      MM_RUNTIME_RUN_DIR: /var/run/minemeld
+      MINEMELD_LOCAL_PATH: /var/lib/mm-ng-core
+      MM_SAMPLE_CONFIG_DIR: /etc/mm-ng-core
+      MINEMELD_PROTOTYPE_PATH: /var/lib/mm-ng-core/prototypes:/etc/mm-ng-core/prototypes
+      MINEMELD_LOCAL_PROTOTYPE_PATH: /var/lib/mm-ng-core/prototypes
+      MINEMELD_LOCAL_LIBRARY_PATH: /var/lib/mm-ng-core/library
+      MINEMELD_LOG_DIRECTORY_PATH: /var/log/mm-ng-core
+      MINEMELD_7Z_PATH: /usr/bin/7z
+      MINEMELD_LOCAL_CERTS_PATH: /var/lib/mm-ng-core/certs/site
+      MM_ENGINE_LOG_FILE: /var/log/mm-ng-core/minemeld-engine.log
+      MM_LOCAL_CA_DIR: /var/lib/mm-ng-core/certs/site
+      MM_LOCAL_CA_OWNER: "${LOCAL_UID:-1002}:${LOCAL_GID:-1002}"
+      MM_CA_BUNDLE: /var/lib/mm-ng-core/certs/ca-bundle.crt
+      REQUESTS_CA_BUNDLE: /var/lib/mm-ng-core/certs/ca-bundle.crt
+      SSL_CERT_FILE: /var/lib/mm-ng-core/certs/ca-bundle.crt
+      CURL_CA_BUNDLE: /var/lib/mm-ng-core/certs/ca-bundle.crt
+    entrypoint:
+      - /bin/sh
+      - /etc/mm-ng-core/run-core.sh
+      - mm-run
+    volumes:
+      - ./mm-ng-core/docker/minimal:/etc/mm-ng-core:ro
+      - ./runtime/local:/var/lib/mm-ng-core
+      - ./runtime/run:/var/run/minemeld
+      - ./runtime/logs:/var/log/mm-ng-core
+    command:
+      - --multiprocessing
+      - "16"
+      - --nodes-per-chassis
+      - "10"
+      - /var/lib/mm-ng-core/config/running-config.yml
+
+  api:
+    image: mm-ng-core
+    container_name: mm-ng-api
+    build:
+      context: ./mm-ng-core
+    ulimits:
+      nofile:
+        soft: 65535
+        hard: 65535
+    entrypoint:
+      - /bin/sh
+      - /etc/mm-ng-core/init-runtime-config.sh
+      - mm-api
+    command:
+      - --host
+      - 0.0.0.0
+      - --port
+      - "5000"
+    ports:
+      - "5000:5000"
+    depends_on:
+      redis:
+        condition: service_healthy
+      core:
+        condition: service_started
+      traced:
+        condition: service_started
+    environment:
+      REDIS_URL: redis://redis:6379/0
+      MM_CONFIG: /var/lib/mm-ng-core/config/running-config.yml
+      MM_RUNTIME_CONFIG_DIR: /var/lib/mm-ng-core/config
+      MM_RUNTIME_CONTROL_DIR: /var/lib/mm-ng-core/control
+      MINEMELD_LOCAL_PATH: /var/lib/mm-ng-core
+      MM_SAMPLE_CONFIG_DIR: /etc/mm-ng-core
+      MM_NG_SKIP_NATIVE: "1"
+      MM_DISABLE_COLLECTD: "1"
+      SNS_ENABLED: "False"
+      SESSION_COOKIE_SECURE: "0"
+      MINEMELD_PROTOTYPE_PATH: /var/lib/mm-ng-core/prototypes:/etc/mm-ng-core/prototypes
+      MINEMELD_LOCAL_PROTOTYPE_PATH: /var/lib/mm-ng-core/prototypes
+      MINEMELD_LOCAL_LIBRARY_PATH: /var/lib/mm-ng-core/library
+      MINEMELD_LOG_DIRECTORY_PATH: /var/log/mm-ng-core
+      MINEMELD_7Z_PATH: /usr/bin/7z
+      MINEMELD_GIT_PATH: /usr/bin/git
+      MINEMELD_PIP_PATH: /usr/local/bin/pip
+      MINEMELD_RESTORE_PATH: /usr/local/bin/mm-restore
+      MINEMELD_TRACED_PURGE_PATH: /usr/local/bin/mm-traced-purge
+      MINEMELD_LOCAL_CERTS_PATH: /var/lib/mm-ng-core/certs/site
+      MM_ENGINE_LOG_FILE: /var/log/mm-ng-core/minemeld-engine.log
+      MM_WEB_LOG_FILE: /var/log/mm-ng-core/minemeld-web.log
+      MM_LOCAL_CA_DIR: /var/lib/mm-ng-core/certs/site
+      MM_LOCAL_CA_OWNER: "${LOCAL_UID:-1002}:${LOCAL_GID:-1002}"
+      MM_CA_BUNDLE: /var/lib/mm-ng-core/certs/ca-bundle.crt
+      REQUESTS_CA_BUNDLE: /var/lib/mm-ng-core/certs/ca-bundle.crt
+      SSL_CERT_FILE: /var/lib/mm-ng-core/certs/ca-bundle.crt
+      CURL_CA_BUNDLE: /var/lib/mm-ng-core/certs/ca-bundle.crt
+    volumes:
+      - ./mm-ng-core/docker/minimal:/etc/mm-ng-core:ro
+      - ./runtime/local:/var/lib/mm-ng-core
+      - ./runtime/run:/var/run/minemeld
+      - ./runtime/logs:/var/log/mm-ng-core
+
+  webui:
+    image: mm-ng-webui
+    container_name: mm-ng-webui
+    build:
+      context: ./mm-ng-webui
+    ports:
+      - "8080:80"
+    depends_on:
+      - api
+
+  webui-vite:
+    image: mm-ng-webui-vite
+    container_name: mm-ng-webui-vite
+    build:
+      context: ./mm-ng-webui-vite
+    ports:
+      - "8088:80"
+    depends_on:
+      - api
+
+  traced:
+    image: mm-ng-core
+    container_name: mm-ng-traced
+    build:
+      context: ./mm-ng-core
+    ulimits:
+      nofile:
+        soft: 65535
+        hard: 65535
+    entrypoint:
+      - /bin/sh
+      - /etc/mm-ng-core/init-runtime-config.sh
+      - mm-traced
+    working_dir: /var/lib/mm-ng-core/traced
+    command:
+      - /etc/mm-ng-core/traced.yml
+    depends_on:
+      redis:
+        condition: service_healthy
+      core:
+        condition: service_started
+    environment:
+      REDIS_URL: redis://redis:6379/0
+      MM_NG_SKIP_NATIVE: "1"
+      MINEMELD_LOCAL_PATH: /var/lib/mm-ng-core
+      MM_RUNTIME_CONFIG_DIR: /var/lib/mm-ng-core/config
+      MM_SAMPLE_CONFIG_DIR: /etc/mm-ng-core
+      MINEMELD_LOG_DIRECTORY_PATH: /var/log/mm-ng-core
+      MM_LOCAL_CA_DIR: /var/lib/mm-ng-core/certs/site
+      MM_LOCAL_CA_OWNER: "${LOCAL_UID:-1002}:${LOCAL_GID:-1002}"
+      MM_CA_BUNDLE: /var/lib/mm-ng-core/certs/ca-bundle.crt
+      REQUESTS_CA_BUNDLE: /var/lib/mm-ng-core/certs/ca-bundle.crt
+      SSL_CERT_FILE: /var/lib/mm-ng-core/certs/ca-bundle.crt
+      CURL_CA_BUNDLE: /var/lib/mm-ng-core/certs/ca-bundle.crt
+    volumes:
+      - ./mm-ng-core/docker/minimal:/etc/mm-ng-core:ro
+      - ./runtime/local:/var/lib/mm-ng-core
+      - ./runtime/run:/var/run/minemeld
+      - ./runtime/logs:/var/log/mm-ng-core

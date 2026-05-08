@@ -1,0 +1,41 @@
+{
+  "name": "mm-ng-webui",
+  "version": "0.9.71-20260501",
+  "private": true,
+  "license": "Apache-2.0",
+  "description": "MineMeld-compatible WebUI for the mm-ng project family",
+  "scripts": {
+    "build": "gulp build",
+    "bower:install": "env HOME=$PWD/.cache/home XDG_CONFIG_HOME=$PWD/.cache/config bower install --allow-root",
+    "clean": "gulp clean",
+    "serve": "gulp serve"
+  },
+  "devDependencies": {
+    "ansi-colors": "^4.1.3",
+    "bower": "^1.8.14",
+    "browser-sync": "^3.0.4",
+    "browser-sync-spa": "^1.0.3",
+    "del": "^5.1.0",
+    "fancy-log": "^2.0.0",
+    "gulp": "^4.0.2",
+    "gulp-angular-templatecache": "^3.0.1",
+    "gulp-autoprefixer": "^8.0.0",
+    "gulp-inject": "^5.0.5",
+    "gulp-sass": "^5.1.0",
+    "gulp-sourcemaps": "^3.0.0",
+    "http-proxy-middleware": "^2.0.6",
+    "lodash": "^4.17.21",
+    "ng-annotate-loader": "^0.7.0",
+    "sass": "^1.69.0",
+    "ts-loader": "^9.5.1",
+    "typescript": "^5.3.3",
+    "webpack": "^5.89.0",
+    "webpack-stream": "^7.0.0",
+    "wiredep": "^4.0.0",
+    "yargs": "^17.7.2"
+  },
+  "engines": {
+    "node": ">=20 <21",
+    "npm": ">=10"
+  }
+}

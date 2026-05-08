@@ -1,0 +1,31 @@
+services:
+  redis:
+    image: redis:7-alpine@sha256:286bd4264adb303147270bb2d735352497e950f7b73b2ca42364d63d7daf61ee
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 2s
+      timeout: 1s
+      retries: 30
+
+  mm-ng-core:
+    build:
+      context: .
+    depends_on:
+      redis:
+        condition: service_healthy
+    environment:
+      REDIS_URL: redis://redis:6379/0
+      MM_NG_SKIP_NATIVE: "1"
+      MINEMELD_PROTOTYPE_PATH: /etc/mm-ng-core/prototypes
+    volumes:
+      - ./docker/minimal:/etc/mm-ng-core:ro
+      - mm-ng-core-data:/var/lib/mm-ng-core
+    command:
+      - --multiprocessing
+      - "1"
+      - --nodes-per-chassis
+      - "10"
+      - /etc/mm-ng-core/running-config.yml
+
+volumes:
+  mm-ng-core-data:

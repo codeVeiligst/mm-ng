@@ -1,0 +1,34 @@
+runtime/
+deferred/
+
+# Local tool/session state
+.codex
+.env
+.env.*
+
+# Nested/embedded repositories and dependency trees
+.git/
+node_modules/
+bower_components/
+
+# Build and cache output
+dist/
+build/
+.cache/
+.tmp/
+.sass-cache/
+coverage/
+htmlcov/
+.tox/
+
+# Python local artifacts
+__pycache__/
+*.py[cod]
+*.egg-info/
+.coverage
+.coverage.*
+
+# Editor and OS local files
+.idea/
+.vscode/
+.DS_Store

@@ -1,0 +1,10 @@
+Flask>=3.1,<4
+Flask-Login>=0.6
+Werkzeug>=3.1,<4
+filelock>=3.16
+gunicorn>=23.0
+netaddr>=1.3
+passlib>=1.7
+requests>=2.32
+supervisor>=4.2
+unicodecsv>=0.14

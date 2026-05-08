@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mm-ng-core"
+dynamic = [
+    "version",
+    "description",
+    "readme",
+    "requires-python",
+    "authors",
+    "classifiers",
+    "urls",
+    "dependencies",
+    "scripts",
+    "entry-points",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = [
+    "slow: tests that are too expensive for the default local run",
+]
+addopts = "-ra -m 'not slow'"

@@ -1,0 +1,24 @@
+API_AUTH_ENABLED: true
+FEEDS_AUTH_ENABLED: false
+SNS_ENABLED: false
+READ_WRITE:
+  - admin
+SUPERVISOR_URL: "unix:///var/run/minemeld/minemeld.sock"
+MINEMELD_PROTOTYPE_PATH: "/var/lib/mm-ng-core/prototypes:/etc/mm-ng-core/prototypes"
+MINEMELD_LOCAL_PATH: /var/lib/mm-ng-core
+MINEMELD_LOCAL_PROTOTYPE_PATH: /var/lib/mm-ng-core/prototypes
+MINEMELD_LOCAL_LIBRARY_PATH: /var/lib/mm-ng-core/library
+MINEMELD_LOG_DIRECTORY_PATH: /var/log/mm-ng-core
+MINEMELD_7Z_PATH: /usr/bin/7z
+MINEMELD_GIT_PATH: /usr/bin/git
+MINEMELD_PIP_PATH: /usr/local/bin/pip
+MINEMELD_RESTORE_PATH: /usr/local/bin/mm-restore
+MINEMELD_TRACED_PURGE_PATH: /usr/local/bin/mm-traced-purge
+MINEMELD_LOCAL_CERTS_PATH: /var/lib/mm-ng-core/certs/site
+MM_ENGINE_LOG_FILE: /var/log/mm-ng-core/minemeld-engine.log
+MM_WEB_LOG_FILE: /var/log/mm-ng-core/minemeld-web.log
+MGMTBUS:
+  class: ZMQRedis
+  config:
+    num_connections: 1
+    priority: 2

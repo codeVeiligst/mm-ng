@@ -1,0 +1,27 @@
+fabric:
+  class: ZMQRedis
+  config:
+    num_connections: 1
+    priority: -2
+
+mgmtbus:
+  transport:
+    class: ZMQRedis
+    config:
+      num_connections: 1
+      priority: 2
+  master: {}
+  slave: {}
+
+nodes:
+  localcsv:
+    prototype: mmng.localcsv
+    output: true
+    config:
+      path: /etc/mm-ng-core/feeds/trivial.csv
+
+  table:
+    prototype: mmng.table
+    inputs:
+      - localcsv
+    output: true

@@ -1,0 +1,11 @@
+.git
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.tox/
+build/
+dist/
+*.egg-info/
+/tests/
+/docs/_build/
+/docker/minimal/*.lock

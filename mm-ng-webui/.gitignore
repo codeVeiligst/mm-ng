@@ -1,0 +1,14 @@
+node_modules/
+bower_components/
+coverage/
+.sass-cache/
+.cache/
+.idea/
+.tmp/
+dist/
+
+typings/
+
+.DS_Store
+.vscode
+.python-version

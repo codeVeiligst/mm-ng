@@ -1,0 +1,27 @@
+<div class="row">
+    <div class="col-sm-12 col-md-12">
+        <h3 class="m-t-xs" style="display: flex; align-items: center;">
+            <img style="width:auto; height:24px;" src="assets/images/logo.png"/>
+            <span style="margin-left: 5px;">MM-NG WEBUI</span>
+        </h3>
+        <div>VERSION: 0.9.70</div>
+    </div>
+</div>
+<div class="row" style="margin-top: 20px;">
+    <div class="col-sm-12 col-md-12">
+        <div>
+            <a href="https://github.com/mm-ng/mm-ng-webui" class="btn btn-primary">FILE AN ISSUE ON GITHUB</a>
+        </div>
+    </div>
+</div>
+<div class="row" style="margin-top: 50px;">
+    <div class="col-sm-12 col-md-12">
+        <h5>mm-ng-webui community revival</h5>
+        <div>This project is not affiliated with Palo Alto Networks. MineMeld is a trademark of Palo Alto Networks.</div>
+    </div>
+</div>
+<div class="row" style="margin-top: 50px;">
+    <div class="col-sm-12 col-md-12">
+        <h5>Current user: {{ vm.MineMeldCurrentUserService.currentUser.id }} <span ng-if="!vm.MineMeldCurrentUserService.currentUser.read_write">(read-only)</span></h5>
+    </div>
+</div>

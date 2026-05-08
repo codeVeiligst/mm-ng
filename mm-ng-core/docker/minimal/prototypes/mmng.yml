@@ -1,0 +1,68 @@
+description: Minimal prototype library for the mm-ng-core container stack
+prototypes:
+  httpFT:
+    class: minemeld.ft.http.HttpFT
+    node_type: miner
+    description: Generic HTTP text feed
+    config:
+      url: null
+      interval: 3600
+      age_out:
+        default: null
+        sudden_death: true
+        interval: 86400
+
+  simpleJSON:
+    class: minemeld.ft.json.SimpleJSON
+    node_type: miner
+    description: Generic JSON feed over HTTP or HTTPS
+    config:
+      url: null
+      interval: 3600
+      age_out:
+        default: null
+        sudden_death: true
+        interval: 86400
+      extractor: "@"
+      indicator: indicator
+      prefix: json
+
+  localcsv:
+    class: minemeld.ft.localcsv.LocalCSVFT
+    node_type: miner
+    description: Local CSV feed
+    config:
+      interval: 10
+      age_out:
+        default: null
+        sudden_death: true
+        interval: 60
+
+  table:
+    class: minemeld.ft.op.AggregateFT
+    node_type: processor
+    description: Aggregate table
+    config: {}
+
+  aggregateFT:
+    class: minemeld.ft.op.AggregateFT
+    node_type: processor
+    description: Generic aggregate processor
+    config: {}
+
+  redisSet:
+    class: minemeld.ft.redis.RedisSet
+    node_type: output
+    description: Redis-backed output set
+    config:
+      redis_url: null
+      scoring_attribute: last_seen
+      store_value: false
+      max_entries: 1000000
+
+  localDB:
+    class: minemeld.ft.localdb.Miner
+    node_type: miner
+    description: Local SQLite indicator database
+    config:
+      default_ttl: 86400

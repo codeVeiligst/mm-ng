@@ -1,0 +1,7 @@
+Sphinx>=7.3
+sphinx-rtd-theme>=2.0
+tox>=4.15
+pytest>=8.2
+coverage>=7.5
+cython>=3.0
+virtualenv>=20.26

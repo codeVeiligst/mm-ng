@@ -1,0 +1,13 @@
+transport:
+  class: ZMQRedis
+  config:
+    num_connections: 1
+
+writer:
+  threshold: 95
+
+store:
+  max_tables: 5
+
+queryprocessor:
+  max_concurrency: 10
