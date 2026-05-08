@@ -1,4 +1,12 @@
-# mm-ng Local Compose
+# MM-NG
+
+`mm-ng` is a revival of the original MineMeld project by Palo Alto Networks
+for modern Python and container-based deployments. The goal is to preserve the
+MineMeld mental model, configuration semantics, and operator workflows while
+updating the runtime and WebUI stack so the project can be maintained and
+extended again.
+
+## Local Compose
 
 This workspace-level compose file runs the current `mm-ng` development stack:
 
@@ -52,6 +60,82 @@ That directory now ships the deferred `minemeld-node-prototypes` base libraries
 (`minemeld.yml` and `stdlib.yml`) plus a small local `mmng.yml` used by the
 minimal LocalCSV example. The deferred `minemeld-prisma-access` source is kept
 out of core for now because it is an extension with its own custom node class.
+
+## Quick Start
+
+Build and start the full local stack:
+
+```bash
+docker compose build
+docker compose up -d
+```
+
+This starts the core runtime, API, Redis, traced worker, and both WebUIs:
+
+- Legacy AngularJS WebUI: `http://localhost:8080/`
+- Modern React/Vite WebUI: `http://localhost:8088/`
+- API, for local troubleshooting: `http://localhost:5000/`
+
+The local development login is:
+
+```text
+admin / minemeld
+```
+
+If you only want one WebUI, start the preferred frontend and its dependencies
+explicitly:
+
+```bash
+# Modern WebUI only
+docker compose up -d --build redis core traced api webui-vite
+
+# Legacy WebUI only
+docker compose up -d --build redis core traced api webui
+```
+
+Or stop the unused WebUI after starting the full stack:
+
+```bash
+docker compose stop webui
+docker compose stop webui-vite
+```
+
+The compose stack does not terminate HTTPS itself. For TLS, put Caddy, nginx,
+or another host-level reverse proxy in front of the selected WebUI port. Keep
+the WebUI and API behind the same external origin because browser auth uses
+same-origin cookies.
+
+Minimal Caddy example for the modern WebUI:
+
+```caddyfile
+mm-ng.example.com {
+    reverse_proxy 127.0.0.1:8088
+}
+```
+
+Minimal nginx example for the modern WebUI:
+
+```nginx
+server {
+    listen 443 ssl http2;
+    server_name mm-ng.example.com;
+
+    ssl_certificate /etc/letsencrypt/live/mm-ng.example.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/mm-ng.example.com/privkey.pem;
+
+    location / {
+        proxy_pass http://127.0.0.1:8088;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+```
+
+For the legacy WebUI, use the same examples but proxy to `127.0.0.1:8080`.
+When OIDC is enabled, configure the provider redirect URI to the external HTTPS
+origin, for example `https://mm-ng.example.com/auth/oidc/callback`.
 
 ## Extension Install Security
 
